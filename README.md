@@ -11,6 +11,8 @@ We develop a systematic Android agent framework，named AndroidLab. It includes 
 This repository is the code framework for the operation environment and
  benchmark section. We provide two execution modes: AVD on Mac (arm64) and Docker on Linux (x86_64). You can freely add or modify new tasks or Android images according to our framework. We offer a complete evaluation framework that can be used to assess the performance of various Android agents.
 
+We have also open-sourced the Android Instruct dataset mentioned in the paper. Please refer to [here](docs/instruction_tuning.md) for more details.
+
 
 
 ![](./assets/main-picture.png)

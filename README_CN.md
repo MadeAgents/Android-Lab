@@ -10,6 +10,7 @@
 
 该代码库是环境和测试基准的代码框架。我们提供了两种执行模式：在 Mac（arm64）上的 AVD 模式和在 Linux（x86_64）上的 Docker 模式。您可以根据我们的框架自由添加或修改新任务或 Android 镜像。我们提供了完整的评估框架，可用于评估各种 Android agents 的性能。
 
+我们也开源了文章中的Android Instruct数据集，请参考[这里](docs/instruction_tuning.md)。
 
 
 ![](./assets/main-picture.png)
