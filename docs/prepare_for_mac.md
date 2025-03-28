@@ -1,3 +1,5 @@
+> **Note:** Due to recent updates in Android Studio, the existing method for obtaining the AndroidLab AVD may no longer work as expected. Please wait for the updated documentation before proceeding.
+
 ### Prepare AVD on mac(arm64)
 
 1. Install Android Studio and ADB on your machine, and start a virtual machine to ensure that the adb command is properly installed. 
