@@ -1,7 +1,10 @@
 import templates.seeact_screenshot_prompts as SeeActPrompts
+import templates.seeact_xml_prompts as SeeActPrompts_xml
 from evaluation.definition import *
 from evaluation.utils import *
 from templates import *
+import json
+
 
 
 class AutoTask():
@@ -137,6 +140,76 @@ class ScreenSeeActTask(TextOnlyTask):
             )
             query_message = self.agent.prompt_to_message(query_user_prompt, [image_path])
             referring_user_prompt = SeeActPrompts.REFERRING_USER_PROMPT.format(
+                option_prompt="\n".join(f"{item['key']} | {item['value']}" for item in choices_list)
+            )
+
+            messages = [
+                {"role": "system", "content": system_prompt},
+                query_message,
+            ]
+
+            # Stage 1. Query
+            print(">> Stage 1. Query")
+            with open("monitor.log", "w") as f:
+                f.write(json.dumps(messages, indent=4))
+            description = self.agent.act(messages)
+            print(description, end="\n\n")
+            with open("monitor.log", "w") as f:
+                f.write(description)
+            messages.append({"role": "assistant", "content": description})
+            messages.append({"role": "user", "content": referring_user_prompt})
+
+            # Stage 2. Referring
+            print(">> Stage 2. Referring")
+            with open("monitor.log", "w") as f:
+                f.write(json.dumps(messages, indent=4))
+
+            referring = self.agent.act(messages)
+            print(referring, end="\n\n")
+            with open("monitor.log", "w") as f:
+                f.write(referring)
+
+
+        except Exception as e:
+            import traceback
+            print(traceback.print_exc())
+            # print_with_color(f"Error: {e}", "red")
+            # exit(1)
+        referring = referring.split("Final Answer:")[-1].strip()
+        exe_res = self.page_executor(get_code_snippet(referring))
+        self.stage_one_record.append(description)
+        self.record.update_after(exe_res, description + "\n\n==========\n\n" + referring)
+        self.record.turn_number += 1
+
+
+class TextOnlySeeActTask(TextOnlyTask):
+
+    def set_system_prompt(self, instruction):
+        self.record.history = [{
+            "role": "system",
+            "content": SeeActPrompts_xml.QUERY_SYSTEM_PROMPT
+        }]
+        self.stage_one_record = []
+        self.instruction = instruction
+
+    def run_step(self):
+        self.record.update_before(controller=self.controller, need_screenshot=True, ac_status=self.accessibility,
+                                  need_labeled=False)
+        round_count = self.record.get_round_count()
+        try:
+            xml_tree = self.record.get_latest_xml_tree()
+            xml_text = self.record.get_latest_xml()
+            choices_list = extract_bounds(xml_tree)
+            image_path = self.page_executor.current_screenshot
+            system_prompt = SeeActPrompts_xml.QUERY_SYSTEM_PROMPT
+            query_user_prompt = SeeActPrompts_xml.QUERY_USER_PROMPT.format(
+                task=self.instruction,
+                previous_actions=("\n\n".join(self.stage_one_record) or "None"),
+                xml_compressed=xml_text
+            )
+            query_message = {"role": "user", "content": query_user_prompt}
+
+            referring_user_prompt = SeeActPrompts_xml.REFERRING_USER_PROMPT.format(
                 option_prompt="\n".join(f"{item['key']} | {item['value']}" for item in choices_list)
             )
 

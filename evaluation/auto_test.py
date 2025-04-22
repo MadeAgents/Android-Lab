@@ -349,7 +349,12 @@ class ScreenReactTask_AutoTest(TextOnlyMobileTask_AutoTest):
     def get_executor(self):
         return VisionExecutor(self.controller, self.config)
 
-
+class TextOnlySeeActTask_AutoTest(TextOnlyMobileTask_AutoTest):
+    def get_agent(self):
+        task_agent = TextOnlySeeActTask(self.instruction, self.controller, self.page_executor, self.llm_agent,
+                                      self.record, self.command_per_step)
+        return task_agent
+    
 class TextOnlyReactTask_AutoTest(TextOnlyMobileTask_AutoTest):
     def get_agent(self):
         task_agent = TextOnlyReactTask(self.instruction, self.controller, self.page_executor, self.llm_agent,
