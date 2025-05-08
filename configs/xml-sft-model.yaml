@@ -1,0 +1,21 @@
+agent:
+  name: LLaMAModelAgent
+  args:
+    api_base: "your_deploy_url:port/v1/chat/completions"
+    temperature: 0.
+
+task:
+  class: TextOnlyMobileTask_AutoTest
+  args:
+    save_dir: "./logs/evaluation"
+    max_rounds: 25
+    request_interval: 3
+    mode: "in_app"
+
+eval:
+  avd_name: Pixel_7_Pro_API_33
+  avd_log_dir: ./logs/evaluation
+  docker: True
+  docker_args:
+    image_name: python-android-env-test:latest
+    port: 6060

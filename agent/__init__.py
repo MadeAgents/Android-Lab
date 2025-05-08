@@ -11,10 +11,12 @@ try:
     from .mllm.qwen_model import *
 except:
     print("Qwen LLM is not available.")
+try:
+    from .llm.llama import *
+except:
+    print("LLAMA is not available.")
 
 from .model import *
-
-
 
 def get_agent(agent_module: str, **kwargs) -> Agent:
     # 直接从全局命名空间中获取类
