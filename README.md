@@ -2,7 +2,10 @@
 
 <p align="center">
    <a href="https://arxiv.org/abs/2410.24024" target="_blank">📃 Paper </a>
+   &nbsp;|&nbsp;
+   <a href="https://docs.google.com/spreadsheets/d/1Zv6mBfd4Ibt8mke24K6zAFrXe4AvEFaBLW3hpJqSgjw/edit?gid=0#gid=0" target="_blank">📊 Leaderboard</a>
 </p>
+
 
 Chinese version of this README is available [here](README_CN.md).
 
