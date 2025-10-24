@@ -20,40 +20,42 @@ def extract_alarms(data):
 
     elements = list(data.values())[0]
     alarms = []
-    alarm = {}
-    alarm["days"] = []
-    Collapse = False
-    for key, element in elements.items():
-        if isinstance(element, str):
+    for k, v in elements.items():
+        if "CardView" not in k:
             continue
-        if "Collapse" in key:
-            Collapse = True
-            alarm["Expand"] = True
-        if clock_end(key, Collapse):
-            if "unchecked" in key:
-                alarm["status"] = "unchecked"
-            else:
-                alarm["status"] = "checked"
-            alarms.append(alarm)
-            alarm = {}
-            Collapse = False
-            alarm["days"] = []
-        if "AM" in key or "PM" in key:
-            alarm["time"] = key
-        if "Label" in key:
-            alarm["label"] = key
-        days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Not scheduled", "Today", "Tomorrow", "Every day"]
 
-        for day in days:
-            if day in key and "TextView" in key:
-                alarm["days"].append(day)
-        if "Ringtone" in key:
-            alarm["ringtone"] = key
-        if "Vibrate" in key:
-            if "unchecked" in key:
-                alarm["vibrate"] = "unchecked"
-            else:
-                alarm["vibrate"] = "checked"
+        alarm = {}
+        alarm["days"] = []
+        Collapse = False
+        for key, element in v.items():
+            if isinstance(element, str):
+                continue
+            if "Collapse" in key:
+                Collapse = True
+                alarm["Expand"] = True
+            if "Switch" in key:
+                if "unchecked" in key:
+                    alarm["status"] = "unchecked"
+                else:
+                    alarm["status"] = "checked"
+            if "AM" in key or "PM" in key:
+                alarm["time"] = key
+            if "Label" in key:
+                alarm["label"] = key
+
+            days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Not scheduled", "Today", "Tomorrow", "Every day"]
+            for day in days:
+                if day in key and "TextView" in key:
+                    alarm["days"].append(day)
+            if "Ringtone" in key:
+                alarm["ringtone"] = key
+            if "Vibrate" in key:
+                if "unchecked" in key:
+                    alarm["vibrate"] = "unchecked"
+                else:
+                    alarm["vibrate"] = "checked"
+
+        alarms.append(alarm)
 
     return alarms
 
