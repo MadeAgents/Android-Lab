@@ -48,6 +48,7 @@ tasks:
     task: Change my Brightness level to 0%
     metric_type: operation
     metric_func: evaluation.tasks.setting
+    adb_query: adb shell settings get system screen_brightness
   - task_id: setting_9
     category: Sound
     task: I need to close down my Ring & notification volume to 0%

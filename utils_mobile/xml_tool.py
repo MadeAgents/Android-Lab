@@ -389,6 +389,9 @@ class UIXMLTree:
                 self.queue.append(child)
 
     def remove_overlap(self):
+        """
+        ERROR: It caused the setting_15 task judgment error.
+        """
         self.queue = deque([self.root])
 
         while self.queue:

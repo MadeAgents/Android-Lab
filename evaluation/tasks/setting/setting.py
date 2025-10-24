@@ -117,15 +117,16 @@ class SingleTask_Setting_6(SingleTask):
     def judge(self, xml_compressed_tree, line):
         if not self.judge_page(xml_compressed_tree):
             return {"judge_page": False}
-        outs = find_subtrees_of_parents_with_key(xml_compressed_tree, "Apps")
-        for out in outs:
-            for key, value in out.items():
-                for storage, _ in value.items():
-                    if "MB" in storage or "GB" in storage:
-                        if ";" in storage:
-                            storage = storage.split(";")[-1]
-                        return {"judge_page": True, "1": storage}
-        return {"judge_page": False}
+        if line["parsed_action"]["action"] != "finish":
+            return {"judge_page": False}
+        try:
+            self.final_ground_truth = "2.2 GB"
+            if self.check_answer(line):
+                return {"judge_page": True, "1": True, "complete": True}
+            else:
+                return {"judge_page": True, "1": False, "complete": False}
+        except:
+            return {"judge_page": True, "1": False, "complete": False}
 
 
 class SingleTask_Setting_7(SingleTask):
@@ -202,16 +203,23 @@ class SingleTask_Setting_8(SingleTask):
     def judge(self, xml_compressed_tree, line):
         if not self.judge_page(xml_compressed_tree):
             return {"judge_page": False}
-        outs = find_subtrees_of_parents_with_key(xml_compressed_tree, "Brightness level ")
-        finish = False
-        for out in outs:
-            out = out.values()
-            for single_out in out:
-                for key, value in single_out.items():
-                    if "%" in key:
-                        key = key.split(";")[-1].rstrip()
-                        break
-        if key == "0%":
+        if "command" not in line:
+            outs = find_subtrees_of_parents_with_key(xml_compressed_tree, "Brightness level ")
+            finish = False
+            for out in outs:
+                out = out.values()
+                for single_out in out:
+                    for key, value in single_out.items():
+                        if "%" in key:
+                            find = True
+                            key = key.split(";")[-1].rstrip()
+                            break
+            if key == "0%":
+                return {"judge_page": True, "1": True, "complete": True}
+            else:
+                return {"judge_page": True, "1": False, "complete": False}
+        command = line["command"]
+        if "1" in command["adb shell settings get system screen_brightness"]:
             return {"judge_page": True, "1": True, "complete": True}
         else:
             return {"judge_page": True, "1": False, "complete": False}
@@ -319,7 +327,7 @@ class SingleTask_Setting_14(SingleTask):
         if line["parsed_action"]["action"] != "finish":
             return {"judge_page": False}
         try:
-            self.final_ground_truth = timezone
+            self.final_ground_truth = f"{timezone} or GMT+00:00"
             if self.check_answer(line):
                 return {"judge_page": True, "1": True, "complete": True}
             else:
@@ -401,29 +409,34 @@ class SingleTask_Setting_18(SingleTask):
         return True
 
     def setting_18_ch(self, xml_compressed_tree):
-        outs = find_subtrees_of_parents_with_key(xml_compressed_tree, "Allow notification access")
-        found = 0
-        finish = False
-        for out in outs:
-            out = out.values()
-            for single_out in out:
-                for key, value in single_out.items():
-                    if found == 1:
-                        if not ("unchecked" in key):
-                            if "checked" in key:
-                                finish = True
-                                break
-                    if found >= 1:
-                        found += 1
-                    if "Allow notification access" in key:
-                        found += 1
-        if found >= 1:
-            if finish:
-                return {"judge_page": True, "1": False, "complete": False}
+        key_words_list = ["Allow notification access", "All Contacts notifications"]
+        for key_words in key_words_list:
+            outs = find_subtrees_of_parents_with_key(xml_compressed_tree, key_words)
+            if len(outs) == 0:
+                continue
+            found = 0
+            finish = False
+            for out in outs:
+                out = out.values()
+                for single_out in out:
+                    for key, value in single_out.items():
+                        if found == 1:
+                            if not ("unchecked" in key):
+                                if "checked" in key:
+                                    finish = True
+                                    break
+                        if found >= 1:
+                            found += 1
+                        if key_words in key:
+                            found += 1
+            if found >= 1:
+                if finish:
+                    return {"judge_page": True, "1": False, "complete": False}
+                else:
+                    return {"judge_page": True, "1": True, "complete": True}
             else:
-                return {"judge_page": True, "1": True, "complete": True}
-        else:
-            return {"judge_page": False}
+                return {"judge_page": False}
+        return {"judge_page": False}
 
     def judge(self, xml_compressed_tree, line):
         if not self.judge_page(xml_compressed_tree):
